@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import  { saveNotesData, saveAppointmentData, getPatientsListData, getUpcomingAppointmentsData  }  from "../service/physicianService";
+import  { saveNotesData, saveAppointmentData, getPatientsListData, getUpcomingAppointmentsData , getScoreData }  from "../service/physicianService";
 
 export const saveNotes = async (req: Request, res: Response) => {
     const note = req.body;
@@ -22,5 +22,11 @@ export const getPatientList = async (req: Request, res: Response) => {
 export const getUpcomingAppointments = async (req: Request, res: Response) => {
     const { physician_id } = req.params;
     const response = await getUpcomingAppointmentsData(physician_id);
+    res.status(200).json(response);
+};
+
+export const getScore = async (req: Request, res: Response) => {
+    const { user_id } = req.params;
+    const response = await getScoreData(user_id);
     res.status(200).json(response);
 };
