@@ -51,7 +51,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const updatePassword = async (req: Request, res: Response) => {
-  const { id, new_password } = req.body.data;
-  const newUser = await updatePasswordByEmail(id, new_password);
+  const { id, password } = req.body;
+  const newUser = await updatePasswordByEmail(id, password);
   res.status(201).json(newUser);
 };
