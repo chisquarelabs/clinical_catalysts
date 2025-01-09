@@ -12,6 +12,7 @@ import Summary from './pages/Summary';
 import Search from './pages/Search';
 import ProtectedRoute from './components/ProtectedRoute';
 import FollowUp from './pages/FollowUp';
+import AssessmentDetails from './pages/AssessmentDetails';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/search" element={<Search />} />
           <Route path="/follow-up" element={<FollowUp />} />
+          <Route path="/assessment/:patientId" element={<AssessmentDetails />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

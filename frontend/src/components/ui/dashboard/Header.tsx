@@ -15,7 +15,7 @@ export function Header() {
           <h1 className="text-xl font-semibold text-slate-800">EMAT</h1>
         </div>
         <button
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
         >
           <LogOut className="h-5 w-5" />

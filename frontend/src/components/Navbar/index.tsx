@@ -12,7 +12,7 @@ const Navbar = () => {
           EMAT
         </Typography>
         <Box>
-          <Button color="inherit" onClick={() => navigate('/login')}>
+          <Button color="inherit" onClick={() => navigate('/')}>
             Login
           </Button>
           <Button color="inherit" onClick={() => navigate('/dashboard')}>

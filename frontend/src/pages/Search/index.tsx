@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Table,
@@ -18,6 +18,15 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import { DashboardLayout } from "../../components/ui/layouts/DashboardLayout";
+import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { Label } from "../../components/ui/label";
 
 interface Patient {
   id: string;
@@ -73,6 +82,23 @@ const Search = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [patients, setPatients] = useState<Patient[]>(mockPatients);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [patientEmail, setPatientEmail] = useState("");
+  const user = localStorage.getItem("user");
+  const userId = user ? JSON.parse(user).id : null;
+
+  const fetchPatients = async () => {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/physician/userList/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    // setPatients(response.data);
+  };
+  useEffect(() => {
+    fetchPatients();
+  }, []);
 
   const getRiskBadgeClass = (risk: Patient["risk"]) => {
     const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
@@ -107,12 +133,42 @@ const Search = () => {
     navigate("/");
   };
 
+  const handleAddPatient = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/physician/addPatient`,
+        {
+          physicianId: userId,
+          patientEmail: patientEmail
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      setIsModalOpen(false);
+      setPatientEmail("");
+      // Refresh the patient list
+      fetchPatients();
+    } catch (error) {
+      console.error("Failed to add patient:", error);
+      // You might want to show an error message to the user
+    }
+  };
+
   return (
     <DashboardLayout onLogout={handleLogout}>
       <div className="p-8">
         <Card>
           <CardHeader>
-            <CardTitle>Patient Records</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle>Patient Records</CardTitle>
+              <Button onClick={() => setIsModalOpen(true)}>
+                Add Patient
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 mb-6">
@@ -165,9 +221,7 @@ const Search = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            /* Handle view details */
-                          }}
+                          onClick={() => navigate(`/assessment/${patient.id}`)}
                         >
                           View Details
                         </Button>
@@ -180,6 +234,32 @@ const Search = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Patient</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="patientEmail">Patient Email</Label>
+              <Input
+                id="patientEmail"
+                type="email"
+                value={patientEmail}
+                onChange={(e) => setPatientEmail(e.target.value)}
+                placeholder="Enter patient email"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddPatient}>Add Patient</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

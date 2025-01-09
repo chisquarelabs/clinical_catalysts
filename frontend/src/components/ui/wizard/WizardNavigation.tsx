@@ -52,9 +52,14 @@ export function WizardNavigation() {
     console.groupEnd();
     
     // Axios call to host
-    const response = await axios.post('http://localhost:8080/answers', {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/answers`, {
       answers,
       userId: "PAT001"
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
     console.log("Resposnse", response);
 

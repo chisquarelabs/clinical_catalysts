@@ -20,7 +20,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchAnswers = async () => {
-      const response = await axios.get(`http://localhost:8080/answers/condition/flags`);
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/answers/condition/flags`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setAnswers(response.data);
     };
     fetchAnswers();

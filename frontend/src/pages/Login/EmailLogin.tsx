@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import { useUser } from '../../context/UserContext';
+import { useUser } from "../../context/UserContext";
 
 export default function EmailLogin() {
   const [email, setEmail] = useState("");
@@ -11,31 +11,43 @@ export default function EmailLogin() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { setUser } = useUser();
+  console.log("Fetching answers", process.env.REACT_APP_API_URL);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/login", {
-        email,
-        password,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/login`,
+        {
+          email,
+          password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
-        const userData = response.data;
+        const { user, token } = response.data;
         setUser({
-          id: userData.id,
-          email: userData.email,
-          f_name: userData.f_name,
-          l_name: userData.l_name,
-          role: userData.role,
-          specialization: userData.specialization,
-          hospital: userData.hospital,
-          profileImage: userData.profileImage,
+          id: user.user_id,
+          email: user.email,
+          f_name: user.f_name,
+          l_name: user.l_name,
+          role: user.role,
+          specialization: user.specialization,
+          hospital: user.hospital,
+          profileImage: user.profileImage,
         });
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        localStorage.setItem("token", token);
         navigate("/dashboard");
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       setError("Login failed. Please try again.");
     }
   };

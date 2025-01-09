@@ -26,9 +26,9 @@ export class User {
   @Column()
   user_id!: string;
 
-  @Column()
+  @Column({ nullable: true })
   physician_id!: string;
   
-  @Column()
+  @Column({ nullable: true })
   is_first_time!: boolean;
 }

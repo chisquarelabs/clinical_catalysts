@@ -4,6 +4,7 @@ import OTPLogin from "../pages/Login/OTPLogin";
 import EmailLogin from "../pages/Login/EmailLogin";
 import Dashboard from "../pages/Dashboard";
 import ProtectedRoute from '../components/ProtectedRoute';
+import AssessmentDetails from "../pages/AssessmentDetails";
 
 export const router = createBrowserRouter([
   {
@@ -21,5 +22,9 @@ export const router = createBrowserRouter([
         <Dashboard />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/assessment/:patientId",
+    element: <AssessmentDetails />,
   },
 ]);
