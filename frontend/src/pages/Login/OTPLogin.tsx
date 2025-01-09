@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { OTPInput } from "../../components/ui/OTPInput";
 import toast from 'react-hot-toast';
 
 export default function OTPLogin() {
+  const { id } = useParams();
   const [otp, setOTP] = useState("");
   const navigate = useNavigate();
 
   const handleVerify = () => {
     if (otp === '000000') {
       sessionStorage.setItem('isAuthenticated', 'true');
-      navigate('/create-password');
+      navigate(`/create-password/${id}`);
     } else {
       setOTP(''); // Clear OTP input
       toast.error('Invalid OTP. Please try again.', {

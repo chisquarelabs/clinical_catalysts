@@ -27,54 +27,16 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
+import moment from "moment";
+import toast from "react-hot-toast";
 
 interface Patient {
   id: string;
   name: string;
-  age: number;
-  condition: string;
-  lastAssessment: string;
-  risk: "High" | "Medium" | "Low";
-  status: "Active" | "Inactive";
+  followUp: string;
 }
 
 const mockPatients: Patient[] = [
-  {
-    id: "P001",
-    name: "John Doe",
-    age: 65,
-    condition: "Dementia",
-    lastAssessment: "2024-03-15",
-    risk: "High",
-    status: "Active",
-  },
-  {
-    id: "P002",
-    name: "Jane Smith",
-    age: 55,
-    condition: "Hypertension",
-    lastAssessment: "2024-02-20",
-    risk: "Medium",
-    status: "Inactive",
-  },
-  {
-    id: "P003",
-    name: "Alice Johnson",
-    age: 45,
-    condition: "Asthma",
-    lastAssessment: "2024-01-10",
-    risk: "Low",
-    status: "Active",
-  },
-  {
-    id: "P004",
-    name: "Bob Brown",
-    age: 35,
-    condition: "Diabetes",
-    lastAssessment: "2024-04-05",
-    risk: "Medium",
-    status: "Active",
-  },
   // Add more mock data as needed
 ];
 
@@ -84,48 +46,35 @@ const Search = () => {
   const [patients, setPatients] = useState<Patient[]>(mockPatients);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [patientEmail, setPatientEmail] = useState("");
+  const [generatedId, setGeneratedId] = useState("");
   const user = localStorage.getItem("user");
   const userId = user ? JSON.parse(user).id : null;
 
   const fetchPatients = async () => {
     const token = localStorage.getItem("token");
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/physician/userList/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/physician/userList/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
-    // setPatients(response.data);
+    );
+    const patients = response.data?.map((patient: any) => ({
+      id: patient.user_id,
+      name: patient.f_name ? patient.f_name + " " + patient.l_name : ' - - ',
+      followUp: patient.appointment_date,
+    }));
+    setPatients(patients);
   };
   useEffect(() => {
     fetchPatients();
   }, []);
 
-  const getRiskBadgeClass = (risk: Patient["risk"]) => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
-    switch (risk) {
-      case "High":
-        return `${baseClasses} bg-red-100 text-red-700`;
-      case "Medium":
-        return `${baseClasses} bg-yellow-100 text-yellow-700`;
-      case "Low":
-        return `${baseClasses} bg-green-100 text-green-700`;
-      default:
-        return baseClasses;
-    }
-  };
-
-  const getStatusBadgeClass = (status: Patient["status"]) => {
-    const baseClasses = "px-2 py-1 rounded-full text-xs font-medium";
-    return status === "Active"
-      ? `${baseClasses} bg-blue-100 text-blue-700`
-      : `${baseClasses} bg-gray-100 text-gray-700`;
-  };
-
   const filteredPatients = patients.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
+      patient.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleLogout = () => {
@@ -133,21 +82,33 @@ const Search = () => {
     navigate("/");
   };
 
+  const generate5digitId = () => {
+    return Math.floor(10000 + Math.random() * 90000).toString();
+  };
+
   const handleAddPatient = async () => {
     try {
       const token = localStorage.getItem("token");
+      const gdId = generate5digitId();
+      setGeneratedId(gdId);
       await axios.post(
-        `${process.env.REACT_APP_API_URL}/physician/addPatient`,
+        `${process.env.REACT_APP_API_URL}/user/createUser`,
         {
-          physicianId: userId,
-          patientEmail: patientEmail
+          physician_id: userId,
+          user_id: gdId,
+          email: patientEmail,
+          password: "123456",
+          role: "patient",
+          otp: "000000",
+          is_first_time: true,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+      toast.success(`Patient added successfully with ID: ${gdId}`);
       setIsModalOpen(false);
       setPatientEmail("");
       // Refresh the patient list
@@ -165,9 +126,7 @@ const Search = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>Patient Records</CardTitle>
-              <Button onClick={() => setIsModalOpen(true)}>
-                Add Patient
-              </Button>
+              <Button onClick={() => setIsModalOpen(true)}>Add Patient</Button>
             </div>
           </CardHeader>
           <CardContent>
@@ -191,31 +150,21 @@ const Search = () => {
                   <TableRow>
                     <TableHead>Patient ID</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Age</TableHead>
-                    <TableHead>Condition</TableHead>
-                    <TableHead>Last Assessment</TableHead>
-                    <TableHead>Risk Level</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Follow Up</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredPatients.map((patient) => (
                     <TableRow key={patient.id}>
-                      <TableCell className="font-medium">{patient.id}</TableCell>
-                      <TableCell>{patient.name}</TableCell>
-                      <TableCell>{patient.age}</TableCell>
-                      <TableCell>{patient.condition}</TableCell>
-                      <TableCell>{patient.lastAssessment}</TableCell>
-                      <TableCell>
-                        <span className={getRiskBadgeClass(patient.risk)}>
-                          {patient.risk}
-                        </span>
+                      <TableCell className="font-medium">
+                        {patient.id}
                       </TableCell>
+                      <TableCell>{patient.name}</TableCell>
                       <TableCell>
-                        <span className={getStatusBadgeClass(patient.status)}>
-                          {patient.status}
-                        </span>
+                        {patient.followUp
+                          ? moment(patient.followUp).format("DD-MM-YYYY")
+                          : ""}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -250,6 +199,9 @@ const Search = () => {
                 onChange={(e) => setPatientEmail(e.target.value)}
                 placeholder="Enter patient email"
               />
+              <div className="text-sm text-gray-500">
+                Generated ID: {generatedId}
+              </div>
             </div>
           </div>
           <DialogFooter>

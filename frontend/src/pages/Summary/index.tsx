@@ -16,7 +16,7 @@ interface SummaryProps {
 const Summary = () => {
   const location = useLocation();
   const { answers } = location.state as SummaryProps;
-  console.log(answers);
+  console.log("answers", answers);
 
   const groupedAnswers = Object.entries(answers).reduce((acc, [id, data]) => {
     const section = questionnaire.sections.find(s => 

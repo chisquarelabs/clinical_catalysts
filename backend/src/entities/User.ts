@@ -11,10 +11,10 @@ export class User {
   @Column()
   password!: string;
 
-  @Column()
+  @Column({ nullable: true })
   f_name!: string;
 
-  @Column()
+  @Column({ nullable: true })
   l_name!: string;
 
   @Column()
@@ -28,7 +28,7 @@ export class User {
 
   @Column({ nullable: true })
   physician_id!: string;
-  
+
   @Column({ nullable: true })
   is_first_time!: boolean;
 }

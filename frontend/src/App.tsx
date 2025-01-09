@@ -20,7 +20,7 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/otp/:id" element={<OTPLogin />} />
           <Route 
             path="/questionnaire" 
             element={
@@ -37,8 +37,8 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/" element={<OTPLogin />} />
-          <Route path="/create-password" element={<CreatePassword />} />
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/create-password/:id" element={<CreatePassword />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/search" element={<Search />} />

@@ -11,7 +11,7 @@ export default function EmailLogin() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { setUser } = useUser();
-  console.log("Fetching answers", process.env.REACT_APP_API_URL);
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +44,11 @@ export default function EmailLogin() {
         });
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         localStorage.setItem("token", token);
-        navigate("/dashboard");
+        if(user.role === "patient"){
+          navigate("/questionnaire");
+        } else {
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
       console.error("Login failed:", error);
