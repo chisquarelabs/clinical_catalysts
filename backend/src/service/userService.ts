@@ -28,9 +28,9 @@ export const addUser = async (userData: Partial<User>): Promise<User> => {
     return userRepository.findOne({ where: { email } });
   }
 
-  export const updatePasswordByEmail = async (email: string, new_password: string): Promise<User | null> => {
+  export const updatePasswordByEmail = async (id: string, new_password: string): Promise<User | null> => {
     const userRepository = dataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { email } });
+    const user = await userRepository.findOne({ where: { user_id: id } });
     if(user)
     {
         const hashedPassword = await bcrypt.hash(new_password, 10);
