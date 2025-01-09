@@ -50,6 +50,7 @@ export const getPatientsListData = async (
   const appointmentRepository = dataSource.getRepository(Appointment);
   const data = await usersRepository.find({
     where: { physician_id, role: "patient" },
+    take: 10
   });
   // return data.map(user => ({
   //     const appointmentdetails = await appointmentRepository.findOne({ where: { userId: user.user_id } });
