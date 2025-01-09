@@ -12,7 +12,7 @@ import bcrypt from "bcryptjs";
 
  export const getUsers = (): User[] => {
     let users: User[] = [
-    { id: 1, email: "John Doe", password: "john@example.com", f_name: "password123" , l_name: "", otp: 123, role: "", user_id: "PHY001" }
+    { id: 1, email: "John Doe", password: "john@example.com", f_name: "password123" , l_name: "", otp: 123, role: "", user_id: "PHY001", physician_id: "PHY001", is_first_time: true }
 ];
     return users;
 };

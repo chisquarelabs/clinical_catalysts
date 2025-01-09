@@ -4,23 +4,29 @@ import { DataSource } from "typeorm";
 import "reflect-metadata";
 import userRoutes from "./routes/userRoutes";
 import loginRoutes from "./routes/loginRoutes";
+import answerRoutes from "./routes/answerRoutes";
+import physicianRoutes from "./routes/physicianRoutes";
 import { User } from "./entities/User";
 import { Answers } from "./entities/Answers";
+import { PatientsScore } from "./entities/PatientsScore";
+import { Notes } from "./entities/Notes";
+import { Appointment } from "./entities/Appointment";
+const cors = require('cors');
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
-
+app.use(cors());
 // Database connection configuration
-const connectionUrl = "postgres://postgres:TcsvC8wPtcePyy0ke32t@rubixcube-rds.chwmo8ksmmlm.eu-west-2.rds.amazonaws.com:5432/clinical";
+const connectionUrl = process.env.PG_CONNECTION_URL;
 
 // Create DataSource instance (instead of createConnection)
 export const dataSource = new DataSource({
   type: "postgres",
   url: connectionUrl,
-  entities: [User,Answers],  // Make sure to add all entities you use
+  entities: [User,Answers,PatientsScore,Notes,Appointment],  // Make sure to add all entities you use
   synchronize: true,  // Use cautiously in production
   logging: false,
   extra: { ssl: true },  // Enable SSL for production
@@ -47,6 +53,8 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/user", userRoutes);
 app.use("/login", loginRoutes);
+app.use("/answers", answerRoutes);
+app.use("/physician", physicianRoutes);
 
 // Start the server
 startServer();

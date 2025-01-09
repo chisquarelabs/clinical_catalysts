@@ -25,4 +25,10 @@ export class User {
 
   @Column()
   user_id!: string;
+
+  @Column()
+  physician_id!: string;
+  
+  @Column()
+  is_first_time!: boolean;
 }
